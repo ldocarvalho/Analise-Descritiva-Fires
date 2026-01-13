@@ -1,0 +1,21 @@
+name: TD Traceability
+description: Template para rastreabilidade de Technical Debt
+title: "[TD]"
+labels: TD identified
+body:
+  - type: textarea
+    attributes:
+      label: Context
+      description: Contexto do TD
+  - type: textarea
+    attributes:
+      label: Impact
+      description: Impacto do TD
+  - type: textarea
+    attributes:
+      label: Evidences
+      description: Evidências do TD
+  - type: textarea
+    attributes:
+      label: Additional Details
+      description: Detalhes adicionais

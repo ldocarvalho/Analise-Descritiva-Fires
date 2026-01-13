@@ -1,0 +1,24 @@
+{
+  "name": "analise-descritiva-fires",
+  "version": "1.0.0",
+  "description": "",
+  "main": "setup_td_traceability.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ldocarvalho/Analise-Descritiva-Fires.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ldocarvalho/Analise-Descritiva-Fires/issues"
+  },
+  "homepage": "https://github.com/ldocarvalho/Analise-Descritiva-Fires#readme",
+  "dependencies": {
+    "node-fetch": "^2.7.0",
+    "readline-sync": "^1.4.10"
+  }
+}

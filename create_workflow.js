@@ -1,0 +1,196 @@
+// const fs = require('fs');
+// console.log('📋 Criando workflow...');
+
+// fs.mkdirSync('.github/workflows', { recursive: true });
+
+// fs.writeFileSync(
+//   '.github/workflows/td_sync.yml',
+// `name: TD Traceability Sync (V1)
+
+// on:
+//   issues:
+//     types: [opened, labeled, unlabeled]
+//   project_card:
+//     types: [created, moved]
+
+// env:
+//   TD_STATUSES: >
+//     TD identified,
+//     TD documented,
+//     TD prioritized,
+//     TD communicated,
+//     TD in repayment,
+//     TD in monitoring,
+//     TD archived,
+//     TD ignored
+
+// jobs:
+//   sync:
+//     runs-on: ubuntu-latest
+//     steps:
+//       - name: Sync TD status
+//         uses: actions/github-script@v7
+//         with:
+//           github-token: \${{ secrets.GITHUB_TOKEN }}
+//           script: |
+//             const statuses = process.env.TD_STATUSES.split(',').map(s => s.trim());
+
+//             // -------- ISSUE → PROJECT --------
+//             if (context.eventName === 'issues') {
+//               const issue = context.payload.issue;
+//               const labels = issue.labels.map(l => l.name);
+//               const td = labels.find(l => statuses.includes(l));
+//               if (!td) return;
+
+//               const projects = await github.rest.projects.listForRepo({
+//                 owner: context.repo.owner,
+//                 repo: context.repo.repo
+//               });
+
+//               const project = projects.data.find(p => p.name === 'TD Traceability Project');
+//               if (!project) return;
+
+//               const columns = await github.rest.projects.listColumns({
+//                 project_id: project.id
+//               });
+
+//               const column = columns.data.find(c => c.name === td);
+//               if (!column) return;
+
+//               await github.rest.projects.createCard({
+//                 column_id: column.id,
+//                 content_id: issue.id,
+//                 content_type: 'Issue'
+//               });
+//             }
+
+//             // -------- PROJECT → ISSUE --------
+//             if (context.eventName === 'project_card') {
+//               const card = context.payload.project_card;
+//               if (!card.content_url) return;
+
+//               const column = await github.rest.projects.getColumn({
+//                 column_id: card.column_id
+//               });
+
+//               const issueNumber = card.content_url.split('/').pop();
+
+//               const issue = await github.rest.issues.get({
+//                 owner: context.repo.owner,
+//                 repo: context.repo.repo,
+//                 issue_number: issueNumber
+//               });
+
+//               const cleanLabels = issue.data.labels
+//                 .map(l => l.name)
+//                 .filter(l => !statuses.includes(l));
+
+//               await github.rest.issues.setLabels({
+//                 owner: context.repo.owner,
+//                 repo: context.repo.repo,
+//                 issue_number: issueNumber,
+//                 labels: [...cleanLabels, column.data.name]
+//               });
+//             }
+// `
+// );
+
+// console.log('✅ Workflow criado');
+
+const fs = require('fs');
+console.log('📋 Criando workflow...');
+
+fs.mkdirSync('.github/workflows', { recursive: true });
+
+fs.writeFileSync(
+  '.github/workflows/td_sync.yml',
+`name: TD Traceability Sync (V1)
+
+on:
+  issues:
+    types: [opened, labeled, unlabeled]
+  project_card:
+    types: [created, moved]
+
+env:
+  TD_STATUSES: >
+    TD identified,
+    TD documented,
+    TD prioritized,
+    TD communicated,
+    TD in repayment,
+    TD in monitoring,
+    TD archived,
+    TD ignored
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync TD status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const statuses = process.env.TD_STATUSES.split(',').map(s => s.trim());
+
+            // -------- ISSUE → PROJECT --------
+            if (context.eventName === 'issues') {
+              const issue = context.payload.issue;
+              const labels = issue.labels.map(l => l.name);
+              const td = labels.find(l => statuses.includes(l));
+              if (!td) return;
+
+              const projects = await github.rest.projects.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo
+              });
+
+              const project = projects.data.find(p => p.name === 'TD Traceability Project');
+              if (!project) return;
+
+              const columns = await github.rest.projects.listColumns({
+                project_id: project.id
+              });
+
+              const column = columns.data.find(c => c.name === td);
+              if (!column) return;
+
+              await github.rest.projects.createCard({
+                column_id: column.id,
+                content_id: issue.id,
+                content_type: 'Issue'
+              });
+            }
+
+            // -------- PROJECT → ISSUE --------
+            if (context.eventName === 'project_card') {
+              const card = context.payload.project_card;
+              if (!card.content_url) return;
+
+              const column = await github.rest.projects.getColumn({
+                column_id: card.column_id
+              });
+
+              const issueNumber = card.content_url.split('/').pop();
+
+              const issue = await github.rest.issues.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber
+              });
+
+              const cleanLabels = issue.data.labels
+                .map(l => l.name)
+                .filter(l => !statuses.includes(l));
+
+              await github.rest.issues.setLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                labels: [...cleanLabels, column.data.name]
+              });
+            }
+`
+);
+
+console.log('✅ Workflow criado');
